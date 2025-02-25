@@ -14,29 +14,73 @@ screen=pygame.display.set_mode((1700,950))
 frotyeighte_minutes=pygame.image.load("48_minutes.jpg")
 black=pygame.image.load("black.png")
 prince=pygame.image.load("rage trunks.png")
-host="127.0.0.1"
+HOST="10.1.10.21"
 PORT=5555
 sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 def start_sever():
-    sock.bind((host,PORT))
+    sock.bind((HOST, PORT))
     sock.listen(2)
-    print("waiting for server")
-    con,addr=sock.accept()
-    print(f"sever 2{addr}")
+    print("Waiting for a connection...")
+    conn, addr = sock.accept()
+    print(f"Connected to {addr}")
+
     while True:
-        data=con.recv(1024).decode()
-        if not data :
+        try:
+            data = conn.recv(1024).decode()
+            if not data:
+                break
+
+            print("Received from client:", data)
+            
+            # Broadcast received action to both players
+            conn.send(data.encode())  
+
+        except Exception as e:
+            print("Connection lost:", e)
             break
-        con.send("ACK".encode())
-#weak=pygame.image.load("solider.png")
+
 def startclient():
-    sock.connect((host,PORT))
+    sock.connect((HOST, PORT))
+
+    def send_update(action):
+        sock.send(action.encode())  # This function now exists inside start_client
+
     while True:
-        data="upadate pes"
-        sock.send(data.encode())
-        response=sock.recv(1024).decode()
-        print ("server response",response)
+        try:
+            response = sock.recv(1024).decode()
+            if response:
+                print("Received update:", response)
+
+                # Process actions (movement, attacks)
+                if response == "GOKU_MOVE_UP":
+                    karkrot["rect"].y -= karkrot["speed"]
+                elif response == "GOKU_MOVE_DOWN":
+                    karkrot["rect"].y += karkrot["speed"]
+                elif response == "GOKU_PUNCH":
+                    karkrot["punch"] = True
+                elif response == "GOKU_KAMEHAMEHA":
+                    karkrot["x4_fired"] = True
+
+        except Exception as e:
+            print("Connection lost:", e)
+            break
+
+    sock.connect((HOST, PORT))
+
+def send_update(action):
+    sock.send(action.encode())
+
+    while True:
+        response = sock.recv(1024).decode()
+        if response:
+            print("Received update:", response)
+            # Process actions (movement, attacks)
+
+
+
+#weak=pygame.image.load("solider.png")
+
 mode=input("enters to start sever c to connect as a client")
 if mode=='s':
     threading.Thread(target=start_sever,daemon=True).start()
@@ -121,7 +165,18 @@ while True:
     
             pygame.quit()
     keys=pygame.key.get_pressed()
-    
+    if keys[pygame.K_w]:  
+        send_update("GOKU_MOVE_UP")
+
+    if keys[pygame.K_s]:  
+        send_update("GOKU_MOVE_DOWN")
+
+    if keys[pygame.K_f]:  
+        send_update("GOKU_PUNCH")
+
+    if keys[pygame.K_g]:  
+        send_update("GOKU_KAMEHAMEHA")
+
     if keys[pygame.K_r]:
         if not goku_allready_bounded:
             surf =pygame.image.load(karkrot["forms"][karkrot["current_form"]+1])
