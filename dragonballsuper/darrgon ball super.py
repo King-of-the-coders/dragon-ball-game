@@ -14,73 +14,30 @@ screen=pygame.display.set_mode((1700,950))
 frotyeighte_minutes=pygame.image.load("48_minutes.jpg")
 black=pygame.image.load("black.png")
 prince=pygame.image.load("rage trunks.png")
-HOST="10.1.10.21"
+host=" 10.1.10.135"
 PORT=5555
+
 sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 def start_sever():
-    sock.bind((HOST, PORT))
+    sock.bind((host,PORT))
     sock.listen(2)
-    print("Waiting for a connection...")
-    conn, addr = sock.accept()
-    print(f"Connected to {addr}")
-
+    print("waiting for server")
+    con,addr=sock.accept()
+    print(f"sever 2{addr}")
     while True:
-        try:
-            data = conn.recv(1024).decode()
-            if not data:
-                break
-
-            print("Received from client:", data)
-            
-            # Broadcast received action to both players
-            conn.send(data.encode())  
-
-        except Exception as e:
-            print("Connection lost:", e)
+        data=con.recv(1024).decode()
+        if not data :
             break
-
-def startclient():
-    sock.connect((HOST, PORT))
-
-    def send_update(action):
-        sock.send(action.encode())  # This function now exists inside start_client
-
-    while True:
-        try:
-            response = sock.recv(1024).decode()
-            if response:
-                print("Received update:", response)
-
-                # Process actions (movement, attacks)
-                if response == "GOKU_MOVE_UP":
-                    karkrot["rect"].y -= karkrot["speed"]
-                elif response == "GOKU_MOVE_DOWN":
-                    karkrot["rect"].y += karkrot["speed"]
-                elif response == "GOKU_PUNCH":
-                    karkrot["punch"] = True
-                elif response == "GOKU_KAMEHAMEHA":
-                    karkrot["x4_fired"] = True
-
-        except Exception as e:
-            print("Connection lost:", e)
-            break
-
-    sock.connect((HOST, PORT))
-
-def send_update(action):
-    sock.send(action.encode())
-
-    while True:
-        response = sock.recv(1024).decode()
-        if response:
-            print("Received update:", response)
-            # Process actions (movement, attacks)
-
-
-
+        con.send("ACK".encode())
 #weak=pygame.image.load("solider.png")
-
+def startclient():
+    sock.connect((host,PORT))
+    while True:
+        data="upadate pes"
+        sock.send(data.encode())
+        response=sock.recv(1024).decode()
+        print ("server response",response)
 mode=input("enters to start sever c to connect as a client")
 if mode=='s':
     threading.Thread(target=start_sever,daemon=True).start()
@@ -98,6 +55,7 @@ fist=pygame.image.load("goku fist.png")
 vegeta_fist=pygame.image.load("vegta fist.png")
 beam=pygame.transform.scale(pygame.image.load("galick gun.png"),(1969.5,700.46902))
 ki=pygame.image.load("ki.png")
+Hakai=pygame.image.load("Hakai.png")
 Clash=pygame.image.load("Clash of taitans.png")
 x4= pygame.transform.scale (pygame.image.load("kamehameha.png"),(2300,1000))
 time_for_you_to_pay=pygame.image.load("goku base.png")
@@ -140,6 +98,7 @@ vegeta={
     "rect":do_it_kakrot.get_rect(),
     "speed":5,"beam_fired":False,
     "beam_distnse":0,
+    "Ball_d":0,
     "beam_rect":beam.get_rect(),
     "ki_rect":ki.get_rect(),
     "ki":False,
@@ -149,6 +108,9 @@ vegeta={
     "form":["vegta.png","super vegta.png","super vegta2.png","SUPER SAYIN 3  VEGTA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!.png","god vegta.png","blue.png","e.png","utra ego.png"],
     "current_form": 0,
     "vhealth":100,
+    "speed":5,"Ball_fired":False,
+    "Ball_distnese":0,
+    "Ball_rect":Hakai.get_rect(),
     "vmultipliers":[1,50,100,400,1500,3000,90000,9000000000]
 }
 
@@ -165,18 +127,7 @@ while True:
     
             pygame.quit()
     keys=pygame.key.get_pressed()
-    if keys[pygame.K_w]:  
-        send_update("GOKU_MOVE_UP")
-
-    if keys[pygame.K_s]:  
-        send_update("GOKU_MOVE_DOWN")
-
-    if keys[pygame.K_f]:  
-        send_update("GOKU_PUNCH")
-
-    if keys[pygame.K_g]:  
-        send_update("GOKU_KAMEHAMEHA")
-
+    
     if keys[pygame.K_r]:
         if not goku_allready_bounded:
             surf =pygame.image.load(karkrot["forms"][karkrot["current_form"]+1])
@@ -261,6 +212,10 @@ while True:
         if not vegeta["beam_fired"]:
             vegeta["beam_fired"]=True
             vegeta["beam_rect"].center=vegeta["rect"].center
+    if keys[pygame.K_i]:
+       if not vegeta["Ball_fired"]:
+           vegeta["Ball_fired"]=True
+           vegeta["Ball_rect"].center=vegeta["rect"].center
     if karkrot["x4_fired"]:
         if pygame.Rect.colliderect(vegeta["rect"],karkrot["x4_rect"]):
             vegeta["vhealth"]-= 0.001
@@ -275,6 +230,9 @@ while True:
     if karkrot["the_sprit_bomb_never_failed_us_before_fired"]:
         if pygame.Rect.colliderect(vegeta["rect"],karkrot["the_sprit_bomb_never_failed_us_before_rect"]):
             vegeta["vhealth"]-= 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+    if vegeta["Ball_fired"]:
+        if pygame.Rect.colliderect(karkrot["rect"],vegeta["Ball_rect"]):
+            vegeta["khealth"]-= 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
 
         if karkrot["the_sprit_bomb_d"]>1760:
             karkrot["the_sprit_bomb_never_failed_us_before_fired"]=False
@@ -283,9 +241,17 @@ while True:
             karkrot["the_sprit_bomb_d"]+=5
             karkrot["the_sprit_bomb_never_failed_us_before_rect"].x+=karkrot ["faceing"]*5
             screen.blit(the_sprit_bomb_never_failed_us_before,karkrot["the_sprit_bomb_never_failed_us_before_rect"])
+        if vegeta["Ball_d"]>1760:
+            vegeta["Ball_fired"]=False
+            vegeta["the_sprit_bomb_d"]=0
+        else:
+            vegeta["Ball_d"]+=5
+            vegeta["Ball_rect"].x+=vegeta ["facing"]*5
+            screen.blit(Hakai,vegeta["Ball_rect"])
+            
     if vegeta["beam_fired"]:
         if pygame.Rect.colliderect(karkrot["rect"],vegeta["beam_rect"]):
-            karkrot["khealth"]-= 0.001
+            karkrot["khealth"]-= 1
         if vegeta["beam_distnse"]>1760:
             vegeta["beam_fired"]=False
             vegeta["beam_distnse"]=0
