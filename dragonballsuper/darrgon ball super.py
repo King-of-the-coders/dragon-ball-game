@@ -1,3 +1,4 @@
+
 import random
 import pygame
 import socket
@@ -11,10 +12,10 @@ player2_points=0
 player1_areadypress=False
 player2_areadypress=False
 screen=pygame.display.set_mode((1700,950))
-frotyeighte_minutes=pygame.image.load("48_minutes.jpg")
+fortyeight_minutes=pygame.image.load("48_minutes.jpg") #fortyeight
 black=pygame.image.load("black.png")
 prince=pygame.image.load("rage trunks.png")
-host=" 10.1.10.135"
+host="10.1.10.21"
 PORT=5555
 
 sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -31,11 +32,26 @@ def start_sever():
             break
         con.send("ACK".encode())
 #weak=pygame.image.load("solider.png")
+def send_update(action):
+    try:
+        sock.send(action.endcode())
+    except Exception as e:
+        print("error",e)
 def startclient():
     sock.connect((host,PORT))
     while True:
+        if response:
+            if response=="move up":
+                karkrot["rect"].y-=karkrot["speed"]
+            if response=="move down":
+                karkrot["rect"].y+=karkrot["speed"]
+            if response=="move right":
+                karkrot["rect"].x-=karkrot["speed"]
+            if response=="move left":
+                karkrot["rect"].x+=karkrot["speed"]
+                            
         data="upadate pes"
-        sock.send(data.encode())
+        
         response=sock.recv(1024).decode()
         print ("server response",response)
 mode=input("enters to start sever c to connect as a client")
@@ -154,13 +170,17 @@ while True:
     if keys[pygame.K_a] and not karkrot["x4_fired"]:
         karkrot["rect"].x-=karkrot["speed"]
         karkrot["faceing"]=-1
+        send_update("move left")
     if keys[pygame.K_d] and not karkrot["x4_fired"]:
         karkrot["rect"].x+=karkrot["speed"]
         karkrot["faceing"]=1
+        send_update("move right")
     if keys[pygame.K_w] and not karkrot["x4_fired"]:
         karkrot["rect"].y-=karkrot["speed"]
+        send_update("move up")
     if keys[pygame.K_s] and not karkrot["x4_fired"]:
         karkrot["rect"].y+=karkrot["speed"]
+        send_update("move down")
     if keys[pygame.K_g] and karkrot["ki_n"]>800:
         if not karkrot["x4_fired"]:
             karkrot["x4_fired"]=True
@@ -207,7 +227,7 @@ while True:
         vegeta["rect"].y-=vegeta["speed"]
     if keys[pygame.K_DOWN] and not vegeta["beam_fired"]:
         vegeta["rect"].y+=vegeta["speed"]
-    screen.blit(frotyeighte_minutes,(0,0))
+    screen.blit(fortyeight_minutes,(0,0))
     if keys[pygame.K_p]:
         if not vegeta["beam_fired"]:
             vegeta["beam_fired"]=True
