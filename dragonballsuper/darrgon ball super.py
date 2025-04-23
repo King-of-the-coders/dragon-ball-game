@@ -19,6 +19,8 @@ black=pygame.image.load("black.png")
 prince=pygame.image.load("rage trunks.png")
 host="10.1.10.135"
 PORT=5555
+servermode=False
+clinetconceect=None
 
 sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
@@ -27,6 +29,7 @@ def start_sever():
     sock.listen(2)
     print("waiting for server")
     con,addr=sock.accept()
+    clinetconceect=con
     print(f"sever 2{addr}")
     while True:
         data=con.recv(1024).decode()
@@ -36,12 +39,16 @@ def start_sever():
 #weak=pygame.image.load("solider.png")
 def send_update(action):
     try:
-        sock.send(action.endcode())
+        if servermode:
+            clinetconceect.send(action.encode())
+        else:
+            sock.send(action.encode())
     except Exception as e:
         print("error",e)
 def startclient():
     sock.connect((host,PORT))
     while True:
+        response=sock.recv(1024).decode()
         if response:
             if response=="move up":
                 karkrot["rect"].y-=karkrot["speed"]
@@ -54,11 +61,12 @@ def startclient():
                             
         data="upadate pes"
         
-        response=sock.recv(1024).decode()
+        
         print ("server response",response)
 mode=input("enters to start sever c to connect as a client")
 if mode=='s':
     threading.Thread(target=start_sever,daemon=True).start()
+    servermode=True
 elif mode=='c':
     threading.Thread(target=startclient,daemon=True).start()
 
