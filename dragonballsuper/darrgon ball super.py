@@ -3,6 +3,9 @@ import pygame
 import socket
 import threading
 pygame.init()
+
+MAXTRANS=100
+
 collision=False
 explosionness=200
 explosion_pos=(0,0)
@@ -99,6 +102,7 @@ karkrot={
     "ki_n":1000,
     "ki_rect":ki.get_rect(),
     "ki":False,
+    "formtrans":0,
     "kmultipliers":[1,50,100,400,1500,3000,300000,90000000,900000000000000000,90000000000000000000000000000000000000000]
 }
 trunks={
@@ -126,7 +130,8 @@ vegeta={
     "speed":5,"Ball_fired":False,
     "Ball_distnese":0,
     "Ball_rect":Hakai.get_rect(),
-    "vmultipliers":[1,50,100,400,1500,3000,90000,9000000000]
+    "vmultipliers":[1,50,100,400,1500,3000,90000,9000000000],
+    "formtrans": 0,
 }
 
 def getmaxmoney():
@@ -161,6 +166,7 @@ while True:
             karkrot["rect"].centerx=x
             karkrot["rect"].centery=y
             goku_allready_bounded=True
+            karkrot["formtrans"]=MAXTRANS
     else:
         goku_allready_bounded=False
     if keys[pygame.K_f]:
@@ -204,7 +210,7 @@ while True:
             rect = surf.get_rect()
             x= vegeta["rect"].x
             y= vegeta["rect"].y
-            
+            vegeta["formtrans"]=MAXTRANS
             vegeta["surface"] = surf
             vegeta["rect"] = rect
             vegeta["current_form"]+=1
@@ -358,6 +364,12 @@ while True:
             # print(player2_points)
             pygame.display.update()
     if vegeta["vhealth"]>0:
+        if vegeta ["formtrans"] >0:
+            vegeta["formtrans"]-=1
+            screen.blit(ki,vegeta["ki_rect"])
+            vegeta["ki_rect"].center=vegeta["rect"].center   
+            vegeta["ki_n"]+=1
+            
         screen.blit(vegeta["surface"],vegeta["rect"])
         vegeta_phd=pygame.Surface((vegeta["vhealth"]/getmaxmoneyv()*200,40))
         vegeta_phd.fill("black")
@@ -367,6 +379,14 @@ while True:
         screen.blit(vegeta_fullh,(800,30))
         screen.blit(vegeta_phd,(800,30))
     if karkrot["khealth"]>0:
+
+        if karkrot ["formtrans"] >0:
+            karkrot["formtrans"]-=1
+            screen.blit(ki,karkrot["ki_rect"])
+            karkrot["ki_rect"].center=karkrot["rect"].center   
+            karkrot["ki_n"]+=1
+
+
         screen.blit(karkrot["surface"],karkrot["rect"])
         karkrot_fullh=pygame.Surface((200,40))
         karkrot_fullh.fill("white")
