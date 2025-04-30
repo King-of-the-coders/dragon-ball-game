@@ -105,15 +105,15 @@ def start_sever():
 def send_update():
     try:
         if servermode and clinetconceect.send:
-            clinetconceect.send(json.dumps({
+            clinetconceect.send(str(json.dumps({
                 "x":karkrot["rect"].x,
                 "y":karkrot["rect"].y,
-            }))
+            })+"3 sword stly oni gri").encode())
         else:
-            sock.send(json.dumps({
+            sock.send(str(json.dumps({
                 "x":vegeta["rect"].x,
                 "y":vegeta["rect"].y,
-            }))
+            })+"3 sword stly oni gri").encode())
     except Exception as e:
         print("error",e)
 def startclient():
@@ -121,7 +121,7 @@ def startclient():
     while True:
         response=sock.recv(1024).decode()
         if response:
-            data=json.loads(response)
+            data=json.loads(response.split("3 sword stly oni gri")[0])
             karkrot["rect"].x = data["x"]
             karkrot["rect"].y = data["y"]
                             
