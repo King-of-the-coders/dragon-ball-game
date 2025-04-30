@@ -98,8 +98,20 @@ def start_sever():
     print(f"sever 2{addr}")
     while True:
         data=con.recv(1024).decode()
-        if not data :
-            break
+
+        response=con.recv(1024).decode()
+        if response:
+            data=json.loads(response.split("3 sword stly oni gri")[0])
+            
+            vegeta["rect"].x = data["x"]
+            vegeta["rect"].y = data["y"]
+            vegeta["current_form"] = data["form"]
+
+            surf =pygame.image.load(vegeta["form"][vegeta["current_form"]])
+            
+            vegeta["surface"] = surf
+                            
+        data="upadate pes"
         con.send("ACK".encode())
 #weak=pygame.image.load("solider.png")
 def send_update():
@@ -108,11 +120,13 @@ def send_update():
             clinetconceect.send(str(json.dumps({
                 "x":karkrot["rect"].x,
                 "y":karkrot["rect"].y,
+                "form":karkrot["current_form"]
             })+"3 sword stly oni gri").encode())
         else:
             sock.send(str(json.dumps({
                 "x":vegeta["rect"].x,
                 "y":vegeta["rect"].y,
+                "form":vegeta["current_form"]
             })+"3 sword stly oni gri").encode())
     except Exception as e:
         print("error",e)
@@ -122,8 +136,14 @@ def startclient():
         response=sock.recv(1024).decode()
         if response:
             data=json.loads(response.split("3 sword stly oni gri")[0])
+            
             karkrot["rect"].x = data["x"]
             karkrot["rect"].y = data["y"]
+            karkrot["current_form"] = data["form"]
+
+            surf =pygame.image.load(karkrot["forms"][karkrot["current_form"]])
+            
+            karkrot["surface"] = surf
                             
         data="upadate pes"
         
