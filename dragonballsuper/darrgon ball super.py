@@ -2,6 +2,7 @@ import random
 import pygame
 import socket
 import threading
+import json
 pygame.init()
 
 MAXTRANS=100
@@ -14,70 +15,13 @@ player2_points=0
 player1_areadypress=False
 player2_areadypress=False
 screen=pygame.display.set_mode((1700,950))
-fortyeight_minutes=pygame.image.load("48_minutes.jpg") #fortyeight
+fortyeight_minutes=pygame.image.load("fortyeight_minutes.jpg") #fortyeight
 black=pygame.image.load("black.png")
 prince=pygame.image.load("rage trunks.png")
 host="10.1.10.135"
 PORT=5555
 servermode=False
 clinetconceect=None
-
-sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-def start_sever():
-    global clinetconceect
-    sock.bind((host,PORT))
-    sock.listen(2)
-    print("waiting for server")
-    con,addr=sock.accept()
-    clinetconceect=con
-    print(f"sever 2{addr}")
-    while True:
-        data=con.recv(1024).decode()
-        if not data :
-            break
-        con.send("ACK".encode())
-#weak=pygame.image.load("solider.png")
-def send_update(action):
-    try:
-        if servermode and clinetconceect.send:
-            clinetconceect.send(action.encode())
-        else:
-            sock.send(action.encode())
-    except Exception as e:
-        print("error",e)
-def startclient():
-    sock.connect((host,PORT))
-    while True:
-        response=sock.recv(1024).decode()
-        if response:
-            if response=="move up":
-                karkrot["rect"].y-=karkrot["speed"]
-            if response=="move down":
-                karkrot["rect"].y+=karkrot["speed"]
-            if response=="move right":
-                karkrot["rect"].x-=karkrot["speed"]
-            if response=="move left":
-                karkrot["rect"].x+=karkrot["speed"]
-                            
-        data="upadate pes"
-        
-        
-        print ("server response",response)
-mode=input("enters to start sever c to connect as a client")
-if mode=='s':
-    threading.Thread(target=start_sever,daemon=True).start()
-    servermode=True
-elif mode=='c':
-    threading.Thread(target=startclient,daemon=True).start()
-
-
-#weak_rect = #weak.get_rect()
-#weak_rect=#weak_rect.move(946,449)
-#weakhealth=10
-#weak=[]
-#weak_rect=[]
-#weakhealths=[]
 fist=pygame.image.load("goku fist.png")
 vegeta_fist=pygame.image.load("vegta fist.png")
 beam=pygame.transform.scale(pygame.image.load("galick gun.png"),(1969.5,700.46902))
@@ -142,6 +86,64 @@ vegeta={
     "vmultipliers":[1,50,100,400,1500,3000,90000,9000000000],
     "formtrans": 0,
 }
+sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+def start_sever():
+    global clinetconceect
+    sock.bind((host,PORT))
+    sock.listen(2)
+    print("waiting for server")
+    con,addr=sock.accept()
+    clinetconceect=con
+    print(f"sever 2{addr}")
+    while True:
+        data=con.recv(1024).decode()
+        if not data :
+            break
+        con.send("ACK".encode())
+#weak=pygame.image.load("solider.png")
+def send_update():
+    try:
+        if servermode and clinetconceect.send:
+            clinetconceect.send(json.dumps({
+                "x":karkrot["rect"].x,
+                "y":karkrot["rect"].y,
+            }))
+        else:
+            sock.send(json.dumps({
+                "x":vegeta["rect"].x,
+                "y":vegeta["rect"].y,
+            }))
+    except Exception as e:
+        print("error",e)
+def startclient():
+    sock.connect((host,PORT))
+    while True:
+        response=sock.recv(1024).decode()
+        if response:
+            data=json.loads(response)
+            karkrot["rect"].x = data["x"]
+            karkrot["rect"].y = data["y"]
+                            
+        data="upadate pes"
+        
+        
+        print ("server response",response)
+mode=input("enters to start sever c to connect as a client")
+if mode=='s':
+    threading.Thread(target=start_sever,daemon=True).start()
+    servermode=True
+elif mode=='c':
+    threading.Thread(target=startclient,daemon=True).start()
+
+
+#weak_rect = #weak.get_rect()
+#weak_rect=#weak_rect.move(946,449)
+#weakhealth=10
+#weak=[]
+#weak_rect=[]
+#weakhealths=[]
+
 
 def getmaxmoney():
     h=100.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -188,17 +190,17 @@ while True:
     if keys[pygame.K_a] and not karkrot["x4_fired"]:
         karkrot["rect"].x-=karkrot["speed"]
         karkrot["faceing"]=-1
-        send_update("move left")
+        send_update()
     if keys[pygame.K_d] and not karkrot["x4_fired"]:
         karkrot["rect"].x+=karkrot["speed"]
         karkrot["faceing"]=1
-        send_update("move right")
+        send_update()
     if keys[pygame.K_w] and not karkrot["x4_fired"]:
         karkrot["rect"].y-=karkrot["speed"]
-        send_update("move up")
+        send_update()
     if keys[pygame.K_s] and not karkrot["x4_fired"]:
         karkrot["rect"].y+=karkrot["speed"]
-        send_update("move down")
+        send_update()
     if keys[pygame.K_g] and karkrot["ki_n"]>800:
         if not karkrot["x4_fired"]:
             karkrot["x4_fired"]=True
@@ -445,7 +447,7 @@ while running:
     pygame.display.flip()
 
 # Quit Pygame
-pygame.quit()
+
 
 
     # print(vegeta["vhealth"])
