@@ -15,7 +15,7 @@ player2_points=0
 player1_areadypress=False
 player2_areadypress=False
 screen=pygame.display.set_mode((1700,950))
-fortyeight_minutes=pygame.image.load("fortyeight_minutes.jpg") #fortyeight
+fortyeight_minutes=pygame.image.load("48_minutes.jpg") #fortyeight
 black=pygame.image.load("black.png")
 prince=pygame.image.load("rage trunks.png")
 host="10.1.10.135"
@@ -48,7 +48,7 @@ karkrot={
     "x4_rect":x4.get_rect(),
     "faceing":-1,
     "punch":False,
-    "forms":["goku base.png","super goku.png","goku 2.png","goku3.png","god goku.png","blue goku.png","x10 goku.png","sign goku.png","utra instick.png","mui.png"],
+    "forms":["goku base.png","super goku.png","goku 2.png","goku3.png","god goku.png","blue goku.png","x10 goku.png","sign goku.png","utra instick.png","mui.png","Super 4 divine.png"],
     "the_sprit_bomb_d":0,
     "current_form": 0,
     "khealth":100,
@@ -56,7 +56,7 @@ karkrot={
     "ki_rect":ki.get_rect(),
     "ki":False,
     "formtrans":0,
-    "kmultipliers":[1,50,100,400,1500,3000,300000,90000000,900000000000000000,90000000000000000000000000000000000000000]
+    "kmultipliers":[1,50,100,400,1500,3000,300000,90000000,900000000000000000,90000000000000000000000000000000000000000,100000000000000000000000000000000000000000000000000000000000000000000000000000000000]
 }
 trunks={
     "surface":prince,
@@ -112,7 +112,7 @@ def start_sever():
             vegeta["surface"] = surf
                             
         data="upadate pes"
-        con.send("ACK".encode())
+            
 #weak=pygame.image.load("solider.png")
 def send_update():
     try:
@@ -346,7 +346,7 @@ while True:
 
     if vegeta["punch"]:
         if pygame.Rect.colliderect(karkrot["rect"],vegeta["rect"]):
-            if (karkrot["current_form"]  == 7 or karkrot["current_form"]==8 or karkrot["current_form"]==9) and random.randint(0,100) >90:
+            if (karkrot["current_form"]  == 7 or karkrot["current_form"]==8 or karkrot["current_form"]==9 or karkrot["current_form"]==10) and random.randint(0,100) >90:
                 pass
             else:
                 karkrot["khealth"]-= 500*karkrot["kmultipliers"][karkrot["current_form"]]
