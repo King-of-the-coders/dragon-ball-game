@@ -112,6 +112,8 @@ def start_sever():
             surf =pygame.image.load(vegeta["form"][vegeta["current_form"]])
             
             vegeta["surface"] = surf
+
+            karkrot["khealth"] = data["enmey lives"]
                             
         data="upadate pes"
             
@@ -122,13 +124,16 @@ def send_update():
             clinetconceect.send(str(json.dumps({
                 "x":karkrot["rect"].x,
                 "y":karkrot["rect"].y,
-                "form":karkrot["current_form"]
+                "form":karkrot["current_form"],
+                "enmey lives":vegeta["vhealth"]
+                
             })+"3 sword stly oni gri").encode())
         else:
             sock.send(str(json.dumps({
                 "x":vegeta["rect"].x,
                 "y":vegeta["rect"].y,
-                "form":vegeta["current_form"]
+                "form":vegeta["current_form"],
+                "enmey lives":karkrot["khealth"]
             })+"3 sword stly oni gri").encode())
     except Exception as e:
         print("error",e)
@@ -146,6 +151,8 @@ def startclient():
             surf =pygame.image.load(karkrot["forms"][karkrot["current_form"]])
             
             karkrot["surface"] = surf
+
+            vegeta["vhealth"] = data["enmey lives"]
                             
         data="upadate pes"
         
