@@ -430,6 +430,8 @@ while True:
         screen.blit(karkrot_fullh,(30,30))
         screen.blit(karkrot_phd,(30,30))
     
+    send_update()
+    
     pygame.display.update()
     import pygame
 
