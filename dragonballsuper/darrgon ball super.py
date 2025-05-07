@@ -7,6 +7,8 @@ pygame.init()
 
 MAXTRANS=100
 
+#do you see this?
+
 collision=False
 explosionness=200
 explosion_pos=(0,0)
