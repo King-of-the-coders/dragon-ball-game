@@ -38,6 +38,10 @@ the_sprit_bomb_never_failed_us_before=pygame.image.load("oh you are so dead.png"
 super_sayian_2=pygame.image.load("th beast.png")
 goku_allready_bounded=False
 vegeta_allready_bounded=False
+
+vhset=-1
+khset=-1
+
 karkrot={
     "surface":time_for_you_to_pay,
     "rect":time_for_you_to_pay.get_rect(),
@@ -91,7 +95,7 @@ vegeta={
 sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 def start_sever():
-    global clinetconceect
+    global clinetconceect,khset
     sock.bind((host,PORT))
     sock.listen(2)
     print("waiting for server")
@@ -113,7 +117,7 @@ def start_sever():
             
             vegeta["surface"] = surf
 
-            karkrot["khealth"] = data["enmey lives"]
+            khset = data["enmey lives"]
                             
         data="upadate pes"
             
@@ -138,6 +142,7 @@ def send_update():
     except Exception as e:
         print("error",e)
 def startclient():
+    global vhset
     sock.connect((host,PORT))
     while True:
         response=sock.recv(1024).decode()
@@ -152,7 +157,7 @@ def startclient():
             
             karkrot["surface"] = surf
 
-            vegeta["vhealth"] = data["enmey lives"]
+            vhset = data["enmey lives"]
                             
         data="upadate pes"
         
@@ -191,6 +196,13 @@ while True:
     
             pygame.quit()
     keys=pygame.key.get_pressed()
+
+    if khset != -1:
+        karkrot["khealth"] = khset
+        khset=-1
+    if vhset != -1:
+        vegeta["vhealth"] = vhset
+        vhset=-1
     
     if keys[pygame.K_r]:
         if not goku_allready_bounded:
