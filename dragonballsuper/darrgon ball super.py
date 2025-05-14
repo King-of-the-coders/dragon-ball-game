@@ -11,7 +11,7 @@ player2_points=0
 player1_areadypress=False
 player2_areadypress=False
 screen=pygame.display.set_mode((1700,950))
-fortyeight_minutes=pygame.image.load("fortyeight_minutes.jpg") #fortyeight
+fortyeight_minutes=pygame.image.load("48_minutes.jpg") #fortyeight
 black=pygame.image.load("black.png")
 prince=pygame.image.load("rage trunks.png")
 host="10.1.10.135"
@@ -38,6 +38,9 @@ def send_update(action):
         print("error",e)
 def startclient():
     sock.connect((host,PORT))
+    data="upadate pes"
+    
+    response=sock.recv(1024).decode()
     while True:
         if response:
             if response=="move up":
@@ -49,9 +52,6 @@ def startclient():
             if response=="move left":
                 karkrot["rect"].x+=karkrot["speed"]
                             
-        data="upadate pes"
-        
-        response=sock.recv(1024).decode()
         print ("server response",response)
 mode=input("enters to start sever c to connect as a client")
 if mode=='s':
@@ -349,12 +349,28 @@ while True:
             else:
                 player1_areadypress=False
                 #print("player1")
-            explosion_pos=(explosion_pos[0]+player1_points-player2_points,explosion_pos[1])
+            explosion_pos=(explosion_pos[0] + (player1_points-player2_points) * 0.1,explosion_pos[1])
             if vegeta["vhealth"]>0:
                 screen.blit(vegeta["surface"],vegeta["rect"])
             if karkrot["khealth"]>0:
                 screen.blit(karkrot["surface"],karkrot["rect"])
+
+            if karkrot["rect"].collidepoint(explosion_pos[0] +187.5,explosion_pos[1] +187.5):
+                continu=False
+                karkrot["khealth"] *= 0.75
+                karkrot["x4_fired"]=False
             # print(player1_points)
+                vegeta ["beam_fired"]=False
+                collision=False
+                break
+            if vegeta["rect"].collidepoint(explosion_pos[0] +187.5,explosion_pos[1] +187.5):
+                continu=False
+                vegeta["vhealth"] *= 0.75
+                karkrot["x4_fired"]=False
+            # print(player1_points)
+                vegeta ["beam_fired"]=False
+                collision=False
+                break
             # print(player2_points)
             pygame.display.update()
     if vegeta["vhealth"]>0:
